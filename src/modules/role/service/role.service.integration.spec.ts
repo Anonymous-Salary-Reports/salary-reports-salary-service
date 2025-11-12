@@ -1,6 +1,7 @@
 import { RoleService } from './role.service';
 import {
-  cleanUpTest,
+  cleanupTestData,
+  closeAndStopDatabase,
   configureTest,
   TestConfig,
   TestDatabaseInstance,
@@ -14,6 +15,7 @@ import {
   RoleCategorySchema,
 } from '../../role-category/model/role-category.schema';
 import { getModelToken } from '@nestjs/mongoose';
+import { RoleCategoryModule } from '../../role-category/role-category.module';
 
 describe('Role Service', () => {
   let service: RoleService;
@@ -22,7 +24,7 @@ describe('Role Service', () => {
   let roleModel: Model<Role>;
   let roleCategoryModel: Model<RoleCategory>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const testConfig: TestConfig<RoleService, Role> = await configureTest(
       [
         { name: Role.name, schema: RoleSchema },
@@ -30,6 +32,7 @@ describe('Role Service', () => {
       ],
       RoleService,
       Role.name,
+      [RoleCategoryModule],
     );
 
     service = testConfig.service;
@@ -41,7 +44,9 @@ describe('Role Service', () => {
     );
   });
 
-  afterAll(async () => cleanUpTest(mongoConnection, dbInstance));
+  beforeEach(async () => cleanupTestData(mongoConnection));
+
+  afterAll(async () => closeAndStopDatabase(mongoConnection, dbInstance));
 
   it('should save role', async () => {
     const dto = new RoleDto('test role', new RoleCategoryDto('test category'));

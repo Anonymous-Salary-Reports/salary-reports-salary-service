@@ -29,6 +29,7 @@ export async function configureTest<T, V>(
   models: ModelDefinition[],
   serviceClass: Type<T>,
   model: string,
+  additionalImports: Type[] = [],
 ): Promise<TestConfig<T, V>> {
   const dbInstance = await createTestDatabase();
 
@@ -36,6 +37,7 @@ export async function configureTest<T, V>(
     imports: [
       MongooseModule.forRoot(dbInstance.uri),
       MongooseModule.forFeature(models),
+      ...additionalImports,
     ],
     providers: [serviceClass],
   }).compile();
@@ -49,7 +51,7 @@ export async function configureTest<T, V>(
   };
 }
 
-export async function cleanUpTest(
+export async function closeAndStopDatabase(
   mongoConnection: Connection,
   dbInstance: TestDatabaseInstance,
 ) {
@@ -57,6 +59,12 @@ export async function cleanUpTest(
     await mongoConnection.close();
   }
   await closeTestDatabase(dbInstance);
+}
+
+export async function cleanupTestData(mongoConnection: Connection) {
+  for (const key in mongoConnection.collections) {
+    await mongoConnection.collections[key].deleteMany({});
+  }
 }
 
 export async function createTestDatabase(): Promise<TestDatabaseInstance> {

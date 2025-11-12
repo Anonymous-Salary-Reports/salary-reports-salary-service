@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { RoleDto } from '../model/role.dto';
 import { RoleService } from '../service/role.service';
 
@@ -6,14 +6,14 @@ import { RoleService } from '../service/role.service';
 export class RoleController {
   constructor(private roleService: RoleService) {}
 
-  @Post('add')
+  @Post()
   async addRole(@Body() roleDto: RoleDto): Promise<RoleDto> {
     return await this.roleService.addRole(roleDto);
   }
 
-  @Get('category/:categoryName')
+  @Get()
   async getAllByCategoryName(
-    @Param('categoryName') categoryName: string,
+    @Query('categoryName') categoryName: string,
   ): Promise<RoleDto[]> {
     return this.roleService.getAllByCategoryName(categoryName);
   }

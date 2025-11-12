@@ -12,6 +12,6 @@ import { RoleCategoryService } from './service/role-category.service';
   ],
   controllers: [RoleCategoryController],
   providers: [RoleCategoryService],
-  exports: [RoleCategoryService],
+  exports: [RoleCategoryService, MongooseModule],
 })
 export class RoleCategoryModule {}

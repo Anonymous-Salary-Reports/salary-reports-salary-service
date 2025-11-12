@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoleCategoryDto } from '../model/role-category.dto';
 import { RoleCategory } from '../model/role-category.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,7 +13,7 @@ export class RoleCategoryService {
 
   async addRoleCategory(
     roleCategoryDto: RoleCategoryDto,
-  ): Promise<RoleCategoryDto> {
+  ): Promise<RoleCategory> {
     const roleCategory = new this.roleCategoryModel({
       name: roleCategoryDto.name,
       lastUpdatedBy: 'SYSTEM', //TODO switch to current user when auth service is implemented
@@ -21,6 +21,15 @@ export class RoleCategoryService {
     });
 
     return await roleCategory.save();
+  }
+
+  async findByName(name: string): Promise<RoleCategory> {
+    const roleCategory = await this.roleCategoryModel.findOne({ name });
+    if (!roleCategory) {
+      throw new NotFoundException('No such category');
+    }
+
+    return roleCategory;
   }
 
   async findAll(): Promise<RoleCategoryDto[]> {

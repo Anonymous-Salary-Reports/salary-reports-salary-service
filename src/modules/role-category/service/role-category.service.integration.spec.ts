@@ -1,6 +1,7 @@
 import { Connection, Model } from 'mongoose';
 import {
-  cleanUpTest,
+  cleanupTestData,
+  closeAndStopDatabase,
   configureTest,
   TestConfig,
   TestDatabaseInstance,
@@ -11,6 +12,7 @@ import {
   RoleCategorySchema,
 } from '../model/role-category.schema';
 import { RoleCategoryDto } from '../model/role-category.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('Role Category Service', () => {
   let service: RoleCategoryService;
@@ -18,7 +20,7 @@ describe('Role Category Service', () => {
   let mongoConnection: Connection;
   let roleCategoryModel: Model<RoleCategory>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const testConfig: TestConfig<RoleCategoryService, RoleCategory> =
       await configureTest(
         [{ name: RoleCategory.name, schema: RoleCategorySchema }],
@@ -32,7 +34,9 @@ describe('Role Category Service', () => {
     roleCategoryModel = testConfig.model;
   });
 
-  afterAll(async () => cleanUpTest(mongoConnection, dbInstance));
+  beforeEach(async () => cleanupTestData(mongoConnection));
+
+  afterAll(async () => closeAndStopDatabase(mongoConnection, dbInstance));
 
   it('should save role category', async () => {
     const dto = new RoleCategoryDto('test');
@@ -40,9 +44,8 @@ describe('Role Category Service', () => {
 
     expect(result.name).toEqual('test');
 
-    const persisted = await roleCategoryModel.find();
-    expect(persisted.length).toEqual(1);
-    expect(persisted[0].name).toEqual('test');
+    const persisted = await service.findByName(result.name);
+    expect(persisted.name).toEqual('test');
   });
 
   it('should find all categories', async () => {
@@ -64,6 +67,15 @@ describe('Role Category Service', () => {
     expect(categoriesFetched.length).toEqual(2);
     expect(categoriesFetched.map((it) => it.name)).toEqual(
       expect.arrayContaining(['categoryA', 'categoryB']),
+    );
+  });
+
+  it('should throw not found exception when no such category', async () => {
+    const dto = new RoleCategoryDto('test');
+    await service.addRoleCategory(dto);
+
+    await expect(service.findByName('nonexistent')).rejects.toThrow(
+      NotFoundException,
     );
   });
 });

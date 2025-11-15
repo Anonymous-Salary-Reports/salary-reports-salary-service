@@ -60,7 +60,7 @@ describe('Role Service', () => {
     expect(persisted[0].name).toEqual('test role');
   });
 
-  it('should get all by category name', async () => {
+  it('should get all by category id', async () => {
     const category = new roleCategoryModel({
       name: 'category',
       createdBy: 'SYSTEM',
@@ -70,24 +70,28 @@ describe('Role Service', () => {
     await roleCategoryModel.bulkSave([category]);
     const persistedCategory = await roleCategoryModel.find();
 
+    const roleCategoryId = persistedCategory[0]._id as string;
     const roleA = new roleModel({
       name: 'roleA',
-      roleCategoryId: persistedCategory[0]._id,
+      roleCategoryId: roleCategoryId,
       createdBy: 'SYSTEM',
       lastUpdatedBy: 'SYSTEM',
     });
     const roleB = new roleModel({
       name: 'roleB',
-      roleCategoryId: persistedCategory[0]._id,
+      roleCategoryId: roleCategoryId,
       createdBy: 'SYSTEM',
       lastUpdatedBy: 'SYSTEM',
     });
 
     await roleModel.bulkSave([roleA, roleB]);
+    const rolesFetched = await service.getAllByCategoryId(roleCategoryId);
 
-    const rolesFetched = await service.getAllByCategoryName(category.name);
     expect(rolesFetched.length).toEqual(2);
-    // expect(rolesFetched).toContainEqual(roleA.toDto());
-    // expect(rolesFetched).toContainEqual(roleB.toDto());
+    [roleA, roleB].forEach((role) => {
+      expect(rolesFetched).toContainEqual(
+        new RoleDto(role.name, new RoleCategoryDto(category.name)),
+      );
+    });
   });
 });

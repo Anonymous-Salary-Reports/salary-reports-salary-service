@@ -38,6 +38,7 @@ describe('Role E2E test', () => {
 
   afterEach(async () => cleanupTestData(mongoConnection));
 
+  /* eslint-disable @typescript-eslint/no-unsafe-argument */
   it('should add a role and get it', async () => {
     const roleDto: RoleDto = {
       name: 'test role',
@@ -49,11 +50,12 @@ describe('Role E2E test', () => {
       .expect(201);
 
     const addedRole = addRoleResponse.body as Role;
+    const roleCategoryId = addedRole.roleCategoryId;
     expect(addedRole.name).toEqual('test role');
-    expect(addedRole.roleCategoryId).toBeDefined();
+    expect(roleCategoryId).toBeDefined();
 
     const getRoleResponse = await request(app.getHttpServer())
-      .get('/role?categoryName=test%20category')
+      .get(`/role/category/${roleCategoryId.toString()}`)
       .expect(200);
 
     expect((getRoleResponse.body as RoleDto[])[0]).toEqual(roleDto);

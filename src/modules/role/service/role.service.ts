@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Role } from '../model/role.schema';
 import { Model } from 'mongoose';
@@ -40,19 +44,23 @@ export class RoleService {
     return await role.save();
   }
 
-  async getAllByCategoryName(categoryName: string): Promise<RoleDto[]> {
+  async getAllByCategoryId(categoryId: string): Promise<RoleDto[]> {
     const category = await this.roleCategoryModel.findOne({
-      name: categoryName,
+      _id: categoryId,
     });
 
     if (!category) {
-      return [];
+      throw new BadRequestException('Role not found');
     }
 
     const roles = await this.roleModel.find({ roleCategoryId: category._id });
 
+    if (roles.length === 0) {
+      throw new BadRequestException('Role not found');
+    }
+
     return roles.map(
-      (it) => new RoleDto(it.name, new RoleCategoryDto(categoryName)),
+      (it) => new RoleDto(it.name, new RoleCategoryDto(category.name)),
     );
   }
 }

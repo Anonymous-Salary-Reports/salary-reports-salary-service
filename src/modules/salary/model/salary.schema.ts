@@ -14,12 +14,12 @@ export class Salary extends BaseSchema {
   extras: number;
 
   @Prop({ type: Types.ObjectId, ref: Role.name, required: true })
-  role: Types.ObjectId;
+  roleId: Types.ObjectId;
 
   @Prop({ required: true, min: 0 })
   experienceYears: number;
 
-  @Prop({ enum: Education, required: true })
+  @Prop({ type: String, enum: Education, required: true })
   education: Education;
 
   @Prop({ required: true })
@@ -28,14 +28,22 @@ export class Salary extends BaseSchema {
   @Prop({ min: 12 })
   vacationDays?: number;
 
-  @Prop({ enum: EmployerType, required: true })
+  @Prop({ type: String, enum: EmployerType, required: true })
   employerType: EmployerType;
 
-  @Prop({ required: true, min: 0 })
-  likes: number;
+  @Prop({
+    required: true,
+    type: [{ type: Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  likedBy: Types.ObjectId[];
 
-  @Prop({ required: true, min: 0 })
-  dislikes: number;
+  @Prop({
+    required: true,
+    type: [{ type: Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  dislikedBy: Types.ObjectId[];
 
   @Prop({ min: 1900, max: new Date().getFullYear() })
   startYear?: number;

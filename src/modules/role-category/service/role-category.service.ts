@@ -23,6 +23,11 @@ export class RoleCategoryService {
     return await roleCategory.save();
   }
 
+  async findAll(): Promise<RoleCategoryDto[]> {
+    const roleCategories = await this.roleCategoryModel.find();
+    return roleCategories.map((it) => new RoleCategoryDto(it.name));
+  }
+
   async findByName(name: string): Promise<RoleCategory> {
     const roleCategory = await this.roleCategoryModel.findOne({ name });
     if (!roleCategory) {
@@ -32,8 +37,12 @@ export class RoleCategoryService {
     return roleCategory;
   }
 
-  async findAll(): Promise<RoleCategoryDto[]> {
-    const roleCategories = await this.roleCategoryModel.find();
-    return roleCategories.map((it) => new RoleCategoryDto(it.name));
+  async findById(_id: string): Promise<RoleCategory> {
+    const roleCategory = await this.roleCategoryModel.findOne({ _id });
+    if (!roleCategory) {
+      throw new NotFoundException('No such category');
+    }
+
+    return roleCategory;
   }
 }

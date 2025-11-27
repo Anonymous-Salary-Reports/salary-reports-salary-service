@@ -1,11 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Role } from '../model/role.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { RoleDto } from '../model/role.dto';
 import { RoleCategory } from '../../role-category/model/role-category.schema';
 import { RoleCategoryService } from '../../role-category/service/role-category.service';
@@ -14,11 +10,10 @@ import { RoleCategoryDto } from '../../role-category/model/role-category.dto';
 @Injectable()
 export class RoleService {
   constructor(
+    private roleCategoryService: RoleCategoryService,
+
     @InjectModel(Role.name)
     private roleModel: Model<Role>,
-    private roleCategoryService: RoleCategoryService,
-    @InjectModel(RoleCategory.name)
-    private roleCategoryModel: Model<RoleCategory>,
   ) {}
 
   async addRole(roleDto: RoleDto): Promise<Role> {
@@ -44,23 +39,43 @@ export class RoleService {
     return await role.save();
   }
 
-  async getAllByCategoryId(categoryId: string): Promise<RoleDto[]> {
-    const category = await this.roleCategoryModel.findOne({
-      _id: categoryId,
-    });
-
-    if (!category) {
-      throw new BadRequestException('Role not found');
-    }
-
+  async findAllByCategoryId(categoryId: string): Promise<RoleDto[]> {
+    const category = await this.roleCategoryService.findById(categoryId);
     const roles = await this.roleModel.find({ roleCategoryId: category._id });
 
     if (roles.length === 0) {
-      throw new BadRequestException('Role not found');
+      throw new NotFoundException('Role not found');
     }
 
     return roles.map(
       (it) => new RoleDto(it.name, new RoleCategoryDto(category.name)),
     );
+  }
+
+  async findIdByName(name: string): Promise<Types.ObjectId> {
+    const role = await this.roleModel.findOne({ name });
+    if (!role) throw new NotFoundException('Role not found for the given name');
+
+    return role._id as Types.ObjectId;
+  }
+
+  async findDtoByName(name: string): Promise<RoleDto> {
+    const role = await this.roleModel.findOne({ name });
+    if (!role) throw new NotFoundException('RoleDto not found');
+    const category = await this.roleCategoryService.findById(
+      role.roleCategoryId.toString(),
+    );
+
+    return new RoleDto(role.name, new RoleCategoryDto(category.name));
+  }
+
+  async findDtoById(_id: string): Promise<RoleDto> {
+    const role = await this.roleModel.findOne({ _id });
+    if (!role) throw new NotFoundException('Role not found');
+    const category = await this.roleCategoryService.findById(
+      role.roleCategoryId.toString(),
+    );
+
+    return new RoleDto(role.name, new RoleCategoryDto(category.name));
   }
 }

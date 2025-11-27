@@ -9,13 +9,13 @@ export class RoleController {
 
   @Post()
   async addRole(@Body() roleDto: RoleDto): Promise<Role> {
-    return await this.roleService.addRole(roleDto);
+    return this.roleService.addRole(roleDto);
   }
 
   @Get('/category/:categoryId')
   async getAllByCategoryId(
     @Param('categoryId') categoryId: string,
   ): Promise<RoleDto[]> {
-    return this.roleService.getAllByCategoryId(categoryId);
+    return this.roleService.findAllByCategoryId(categoryId);
   }
 }

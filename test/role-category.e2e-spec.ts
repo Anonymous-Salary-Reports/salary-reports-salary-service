@@ -1,39 +1,27 @@
 import { INestApplication } from '@nestjs/common';
 import {
+  afterE2eTest,
   cleanupTestData,
-  closeAndStopDatabase,
-  createTestDatabase,
+  configureE2eTest,
   TestDatabaseInstance,
 } from '../test-utils/database.helper';
 import { Connection } from 'mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { RoleCategoryModule } from '../src/modules/role-category/role-category.module';
 import { RoleCategoryDto } from '../src/modules/role-category/model/role-category.dto';
 import request from 'supertest';
 
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 describe('Role Category E2E test', () => {
   let app: INestApplication;
   let dbInstance: TestDatabaseInstance;
   let mongoConnection: Connection;
 
   beforeAll(async () => {
-    dbInstance = await createTestDatabase();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [MongooseModule.forRoot(dbInstance.uri), RoleCategoryModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    mongoConnection = moduleFixture.get<Connection>(getConnectionToken());
+    ({ app, dbInstance, mongoConnection } =
+      await configureE2eTest(RoleCategoryModule));
   });
 
-  afterAll(async () => {
-    await closeAndStopDatabase(mongoConnection, dbInstance);
-    await app.close();
-  });
+  afterAll(async () => afterE2eTest(mongoConnection, dbInstance, app));
 
   afterEach(async () => cleanupTestData(mongoConnection));
 

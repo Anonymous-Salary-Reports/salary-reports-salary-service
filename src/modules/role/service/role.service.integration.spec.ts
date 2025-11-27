@@ -85,7 +85,7 @@ describe('Role Service', () => {
     });
 
     await roleModel.bulkSave([roleA, roleB]);
-    const rolesFetched = await service.getAllByCategoryId(roleCategoryId);
+    const rolesFetched = await service.findAllByCategoryId(roleCategoryId);
 
     expect(rolesFetched.length).toEqual(2);
     [roleA, roleB].forEach((role) => {

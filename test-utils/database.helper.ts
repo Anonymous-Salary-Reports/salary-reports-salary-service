@@ -6,7 +6,7 @@ import {
   ModelDefinition,
   MongooseModule,
 } from '@nestjs/mongoose';
-import { Type } from '@nestjs/common';
+import { INestApplication, Type } from '@nestjs/common';
 import { Connection, Model } from 'mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -49,6 +49,30 @@ export async function configureTest<T, V>(
     model: module.get<Model<V>>(getModelToken(model)),
     module,
   };
+}
+
+export async function configureE2eTest<T>(moduleClass: Type<T>) {
+  const dbInstance = await createTestDatabase();
+
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [MongooseModule.forRoot(dbInstance.uri), moduleClass],
+  }).compile();
+
+  const app = moduleFixture.createNestApplication();
+  await app.init();
+
+  const mongoConnection = moduleFixture.get<Connection>(getConnectionToken());
+
+  return { app, dbInstance, mongoConnection };
+}
+
+export async function afterE2eTest(
+  mongoConnection: Connection,
+  dbInstance: TestDatabaseInstance,
+  app: INestApplication,
+): Promise<void> {
+  await closeAndStopDatabase(mongoConnection, dbInstance);
+  await app.close();
 }
 
 export async function closeAndStopDatabase(

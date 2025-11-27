@@ -1,13 +1,11 @@
 import { Connection } from 'mongoose';
 import {
+  afterE2eTest,
   cleanupTestData,
-  closeAndStopDatabase,
-  createTestDatabase,
+  configureE2eTest,
   TestDatabaseInstance,
 } from '../test-utils/database.helper';
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { RoleModule } from '../src/modules/role/role.module';
 import request from 'supertest';
 import { RoleDto } from '../src/modules/role/model/role.dto';
@@ -19,22 +17,10 @@ describe('Role E2E test', () => {
   let mongoConnection: Connection;
 
   beforeAll(async () => {
-    dbInstance = await createTestDatabase();
-
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [MongooseModule.forRoot(dbInstance.uri), RoleModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    mongoConnection = moduleFixture.get<Connection>(getConnectionToken());
+    ({ app, dbInstance, mongoConnection } = await configureE2eTest(RoleModule));
   });
 
-  afterAll(async () => {
-    await closeAndStopDatabase(mongoConnection, dbInstance);
-    await app.close();
-  });
+  afterAll(async () => afterE2eTest(mongoConnection, dbInstance, app));
 
   afterEach(async () => cleanupTestData(mongoConnection));
 

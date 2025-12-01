@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { RoleCategoryModule } from './modules/role-category/role-category.module';
 import { RoleModule } from './modules/role/role.module';
 import { SalaryModule } from './modules/salary/salary.module';
@@ -26,7 +24,7 @@ import { SalaryModule } from './modules/salary/salary.module';
     RoleModule,
     SalaryModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

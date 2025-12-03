@@ -36,7 +36,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # dotenv environment variable files
-.env
+services/salary-service/.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -55,4 +55,10 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+# MongoDB
 /database
+
+# Service-specific
+services/*/node_modules
+services/*/dist
+services/*/.env

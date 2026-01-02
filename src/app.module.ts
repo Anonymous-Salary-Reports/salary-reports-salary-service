@@ -4,6 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RoleCategoryModule } from './modules/role-category/role-category.module';
 import { RoleModule } from './modules/role/role.module';
 import { SalaryModule } from './modules/salary/salary.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -23,8 +26,14 @@ import { SalaryModule } from './modules/salary/salary.module';
     RoleCategoryModule,
     RoleModule,
     SalaryModule,
+    AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -22,7 +22,7 @@ This project is part of a larger system - [Anonymous Salary Reports](https://git
 - `POST /role-category` - Add a new role category
 - `GET /role-category` - Get all role categories
 - `POST /role` - Add a new role
-- `GET /role/:categoryId` - Get all roles for a given category ID
+- `GET /role/category/:categoryId` - Get all roles for a given category ID
 - `POST /salary/create` - Add a new salary entry
 - `GET /salary/get-all-by-role-id/:roleId` - Get all salary entries for a given role ID
 - `POST /salary/toggle-like/salary/:salaryId` - Toggle like for a salary entry

@@ -1,6 +1,6 @@
 # Salary Service
 
-A backend microservice built with Node.js, NestJS, MongoDB (Mongoose), and TypeScript.
+A backend microservice built with Node.js, NestJS, MongoDB (Mongoose), and TypeScript.  
 The service manages roles, role categories, and salary entries, with validation, automated tests, and full CRUD capabilities.
 
 This project is part of a larger system - [Anonymous Salary Reports](https://github.com/Anonymous-Salary-Reports)

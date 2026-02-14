@@ -48,3 +48,12 @@ MONGODB_URI, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_INITD
 - If you're on windows and using WSL, run docker desktop
 - Run `docker compose up -d`
 - Start the application by `npm run start:dev`
+
+## 🧪 Testing
+- Run `npm run test` to execute service integration tests
+- Run `npm run test:e2e` to execute end-to-end tests
+
+## Future Improvements
+- [ ] Implement pagination for GET endpoints
+- [ ] Add search capabilities by field name, operator and value/s
+- [ ] Add functionalities to delete salaries, roles and role categories
